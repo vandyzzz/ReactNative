@@ -6,9 +6,21 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const DetailsScreen = ({navigation,route}) => {
   const plant = route.params;
-  const [count, setCount] = React.useState(countValue);
-  const countValue = 1
+  const [count, setCount] = React.useState(1);
   console.log(plant);
+  const incrementCount = () => {
+    if (count<9) {
+      setCount(count+1)
+    }
+    
+  }
+
+  const decrementCount = () => {
+    if (count>0) {
+      setCount(count-1)
+    }
+    
+  }
   return (
    <SafeAreaView style={{flex:1,backgroundColor:COLORS.white}}>
     <View style={styles.header}>
@@ -46,16 +58,18 @@ const DetailsScreen = ({navigation,route}) => {
           </Text>
           <View style={{marginTop:40,flexDirection:'row',justifyContent:'space-between'}}>
             <View style={{flexDirection:'row',alignItems:'center'}}>
+            <TouchableOpacity onPress={decrementCount}>
               <View style={styles.borderBtn}>
                 <Text style={styles.borderBtnText}>
                   -
                 </Text>
                 
               </View>
+              </TouchableOpacity>
               <Text style={{fontSize:20,marginHorizontal:10,fontWeight:'bold'}}>
-                {countValue}
+                {count}
               </Text>
-              <TouchableOpacity onPress={setCount}>
+              <TouchableOpacity onPress={incrementCount}>
               <View style={styles.borderBtn}>
                 <Text style={styles.borderBtnText}>
                   +
@@ -94,13 +108,12 @@ const styles = StyleSheet.create({
   },
   detailsContainer:{
     flex:0.55,
-    backgroundColor:COLORS.white,
+    backgroundColor:COLORS.light,
     marginHorizontal:7,
     marginBottom:7,
     borderRadius:20,
     marginTop:30,
     paddingTop:30,
-    borderWidth:2
   },
   line:{
     width:25,
