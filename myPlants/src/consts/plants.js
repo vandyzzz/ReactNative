@@ -1,7 +1,7 @@
 const plants = [
     {
       id: 1,
-      name: 'Succulent Plant',
+      name: 'Cactus Plant',
       price: '39.99',
       like: true,
       img: require('../assets/plant1.png'),
@@ -11,7 +11,7 @@ const plants = [
   
     {
       id: 2,
-      name: 'Dragon Plant',
+      name: 'Zhendu Plant',
       price: '29.99',
       like: false,
       img: require('../assets/plant2.png'),
@@ -39,7 +39,7 @@ const plants = [
     },
     {
       id: 5,
-      name: 'Ravenea Plant',
+      name: 'Illa Plant',
       price: '50.99',
       like: true,
       img: require('../assets/plant5.png'),

@@ -7,12 +7,15 @@ import {
   FlatList,
   Dimensions,
   Image,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../../consts/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import plants from '../../consts/plants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const width = Dimensions.get('screen').width / 2 - 30;
 const HomeScreen = ({navigation}) => {
@@ -39,6 +42,16 @@ const HomeScreen = ({navigation}) => {
       </View>
     );
   };
+
+  const removeAll = async () => {
+    try {
+      await AsyncStorage.removeItem('cartItems');
+      Alert.alert("Removed all data")
+    }
+  catch(exception) {
+      console.log(exception)
+  }
+  }
 
   const renderItem = ({item}) => (
     <TouchableOpacity onPress={() =>navigation.navigate("Details",item)} style={{borderWidth:0}}>
@@ -110,7 +123,7 @@ const HomeScreen = ({navigation}) => {
             Plant Shop
           </Text>
         </View>
-        <Icon name="shopping-cart" size={28} color="black" />
+        <Icon name="shopping-cart" size={28} color="black" onPress={() => navigation.navigate("Cart")} />
       </View>
       <View style={{marginTop: 30, flexDirection: 'row'}}>
         <View style={style.searchContainer}>
@@ -123,7 +136,7 @@ const HomeScreen = ({navigation}) => {
           <TextInput placeholder="search" size={25} style={style.input} />
         </View>
         <View style={style.sortBtn}>
-          <Icon name="sort" size={30} color="white" />
+          <Icon name="sort" size={30} color="white" onPress={removeAll} />
         </View>
       </View>
       <CategoryList />

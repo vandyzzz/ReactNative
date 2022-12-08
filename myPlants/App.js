@@ -8,6 +8,7 @@ import HomeScreen from './src/view/screens/HomeScreen';
 import DetailsScreen from './src/view/screens/DetailsScreen';
 import { StatusBar } from 'react-native';
 import COLORS from './src/consts/colors';
+import Cart from './src/view/screens/Cart';
 
 const App = () => {
   return (
@@ -16,6 +17,8 @@ const App = () => {
       <Stack.Navigator screenOptions={{header: () => null}}>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Cart" component={Cart} />
+
       </Stack.Navigator>
     </NavigationContainer>
 
