@@ -9,6 +9,7 @@ import DetailsScreen from './src/view/screens/DetailsScreen';
 import { StatusBar } from 'react-native';
 import COLORS from './src/consts/colors';
 import Cart from './src/view/screens/Cart';
+import VideoRecorder from './src/view/screens/VideoRecorder';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
         <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="VideoRecorder" component={VideoRecorder} />
 
       </Stack.Navigator>
     </NavigationContainer>

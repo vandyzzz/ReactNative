@@ -136,7 +136,7 @@ const HomeScreen = ({navigation}) => {
           <TextInput placeholder="search" size={25} style={style.input} />
         </View>
         <View style={style.sortBtn}>
-          <Icon name="sort" size={30} color="white" onPress={removeAll} />
+          <Icon name="sort" size={30} color="white" onPress={() => navigation.navigate("VideoRecorder")} />
         </View>
       </View>
       <CategoryList />
