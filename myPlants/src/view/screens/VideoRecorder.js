@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,53 +9,53 @@ import {
   Dimensions,
   Image,
   Alert,
+  Video,
 } from 'react-native';
-import { Camera,useCameraDevices } from 'react-native-vision-camera'
-
+import {Camera, useCameraDevices} from 'react-native-vision-camera';
 
 const VideoRecorder = () => {
   const devices = useCameraDevices();
   const device = devices.back;
-  const camera = useRef(null)
+  const camera = useRef(null);
   const [recording, setRecording] = useState(false);
-  const [videos, setVideos] = useState(null);
-  useEffect(()=>{
-
-  },[recording])
+  const [videos, setVideos] = useState([]);
+  useEffect(() => {}, [recording]);
   const startRecording = async () => {
     setRecording(true);
     camera.current.startRecording({
       flash: 'off',
-      onRecordingFinished: (video) => [console.log(video),setVideos(video)],
-      onRecordingError: (error) => console.error(error),
-    })
-    
-   
+      onRecordingFinished: video => [
+        console.log(video),
+        setVideos([
+          ...videos,
+          {uri: video.path, title: 'Video ' + (videos.length + 1)},
+        ]),
+      ],
+      onRecordingError: error => console.error(error),
+    });
   };
 
   const stopRecording = async () => {
-    console.log("stoped");
+    console.log('stoped');
     setRecording(false);
     await camera.current.stopRecording();
   };
   // const isFocused = useIsFocused()
   const takePhotoOptions = {
     qualityPrioritization: 'speed',
-    flash: 'off'
+    flash: 'off',
   };
-    useEffect(()=> {
-      requestCameraPermission()
-      
-    },[])
-  // handler 
+  useEffect(() => {
+    requestCameraPermission();
+  }, []);
+  // handler
   const requestCameraPermission = useCallback(async () => {
     const permission = await Camera.requestCameraPermission();
 
-    if(permission === 'denied') await Linking.openSettings()
-  })
+    if (permission === 'denied') await Linking.openSettings();
+  });
 
   const renderCamera = () => {
-
     // const takePhoto = async () => {
     //   try {
     //     //Error Handle better
@@ -67,112 +67,108 @@ const VideoRecorder = () => {
     //     console.log(error);
     //   }
     // };
-    if(device == null){
+    if (device == null) {
       // console.log(device);
-      return(
+      return (
         <View
           style={{
-            flex:1
-          }}
-        >
-         
-        </View>
-      )
-    }
-    else {
-      return(
-        
-        <View
-        style={styles.mainDiv}
-      >
-        
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={true}
-          enableZoomGesture
-          ref={camera}
-          video={true}
-          
-          
-        >
-
-        </Camera>
-        {/* videos.map((video, index) => (
+            flex: 1,
+          }}></View>
+      );
+    } else {
+      return (
+        <View style={styles.mainDiv}>
+          <Camera
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={true}
+            enableZoomGesture
+            ref={camera}
+            video={true}></Camera>
+          {/* videos.map((video, index) => (
             <View key={index} style={{ flex: 1, alignItems: 'center' }}>
               <Text>{video.title}</Text>
               <Video source={{ uri: video.uri }} style={{ width: '100%', height: 200 }} />
             </View>
           )) */}
-          <View style={{flex:0,flexDirection:'row',gap:10,}}>
-          {videos ? (
-        <View style={{borderWidth:2,borderColor:'white',width:70,height:70,marginRight:5}}>
-          {/* <TouchableOpacity onPress={() => setVideos(null)}> */}
-            <Image
-              source={{ uri: videos.path }}
-              style={{ width: '100%', height: '100%', }}
-            />
-          {/* </TouchableOpacity> */}
-        </View>
-          ) : <></>
-        }
+
+          <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+            {videos ? (
+              videos.map((video, index) => (
+                <View
+                  key={index}
+                  style={{
+                    marginRight: 10,
+                    borderWidth: 1,
+                    borderColor: 'white',
+                  }}>
+                  <Text style={{color: 'white'}}>{video.title}</Text>
+                  <Image
+                    source={{uri: video.uri}}
+                    style={{width: 70, height: 70}}
+                  />
+                </View>
+              ))
+            ) : (
+              <></>
+            )}
           </View>
-       
-        
-        <View style={styles.buttonView}>
-        <TouchableOpacity
-        onPress={() => {
-          if (recording) {
-            stopRecording();
-          } else {
-            startRecording();
-          }
-        }}
-        style={styles.CaptureButton}>
-      </TouchableOpacity>
-           <Text style={styles.recordingStatus}>
+
+          <View style={styles.buttonView}>
+            <TouchableOpacity
+              onPress={() => {
+                if (recording) {
+                  stopRecording();
+                } else {
+                  startRecording();
+                }
+              }}
+              style={styles.CaptureButton}></TouchableOpacity>
+            <Text style={styles.recordingStatus}>
               {recording ? 'Stop Recording' : 'Start Recording'}
             </Text>
+          </View>
+          {/* <View style={{ flex: 1 }}>
+        <Text>Recorded Videos:</Text>
+        {
+          videos.map((video, index) => (
+            <View key={index} style={{ flex: 1, alignItems: 'center' }}>
+              <Text>{video.title}</Text>
+              <Image source={{ uri: video.uri }} style={{ width: '100%', height: 200 }} />
+            </View>
+          ))
+        }
+      </View> */}
         </View>
-
-      </View>
-      )
-      
+      );
     }
-  }
-  return (
-  <View style={{flex:1}}>
-    {renderCamera()}
-  </View>
-  )
-}
+  };
+  return <View style={{flex: 1}}>{renderCamera()}</View>;
+};
 
-export default VideoRecorder
+export default VideoRecorder;
 const styles = StyleSheet.create({
-  mainDiv:{
-    flex:1,
-    flexDirection:'column',
-    justifyContent:'flex-end'
+  mainDiv: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   },
-  CaptureButton:{
+  CaptureButton: {
     width: 90,
     height: 90,
     alignItems: 'center',
     borderRadius: 100,
-    borderWidth:2,
-    borderColor:'white',
-    
+    borderWidth: 2,
+    borderColor: 'white',
   },
-  buttonView:{
-
-    borderWidth:1,
-    alignItems:'center',
-    marginBottom:12,
-    // borderColor:'red'
+  buttonView: {
+    borderWidth: 1,
+    alignItems: 'center',
+    marginBottom: 12,
+    borderColor: 'green',
   },
-  recordingStatus:{
-    fontSize: 14, 
+  recordingStatus: {
+    fontSize: 14,
     color: 'white',
-    
-  }
-})
+  },
+});
