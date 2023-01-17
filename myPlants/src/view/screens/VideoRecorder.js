@@ -6,28 +6,36 @@ import {
   View,
   Image,
   Alert,
-  Video,
+  TextInput,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Video from 'react-native-video';
 
 const VideoRecorder = () => {
   const devices = useCameraDevices();
   const device = devices.back;
   const camera = useRef(null);
+  const [cameraVisible, setcameraVisible] = useState(true);
   const [recording, setRecording] = useState(false);
   const [videos, setVideos] = useState([]);
-  // for duration 
+  // for duration
   const [duration, setDuration] = useState(0);
   const [startTime, setStartTime] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
+  // for displaying selected video
+  const [selectedVideo, setselectedVideo] = useState(null)
+
   useEffect(() => { }, [recording]);
   const startRecording = async () => {
     setRecording(true);
-    setIntervalId(setInterval(() => {
-      setDuration((new Date() - startTime) / 1000);
-    }, 1000));
+    setIntervalId(
+      setInterval(() => {
+        setDuration((new Date() - startTime) / 1000);
+      }, 1000),
+    );
     camera.current.startRecording({
       flash: 'off',
       onRecordingFinished: video => [
@@ -45,8 +53,9 @@ const VideoRecorder = () => {
     console.log('stoped');
     setRecording(false);
     clearInterval(intervalId);
-    setDuration(0)
+    setDuration(0);
     await camera.current.stopRecording();
+    setcameraVisible(false);
   };
   // const isFocused = useIsFocused()
   const takePhotoOptions = {
@@ -57,9 +66,9 @@ const VideoRecorder = () => {
     requestCameraPermission();
   }, []);
 
-  useEffect(()=>{
-    console.log("array=>",videos);
-  },[videos])
+  useEffect(() => {
+    console.log('array=>', videos);
+  }, [videos]);
   // handler
   const requestCameraPermission = useCallback(async () => {
     const permission = await Camera.requestCameraPermission();
@@ -67,6 +76,19 @@ const VideoRecorder = () => {
     if (permission === 'denied') await Linking.openSettings();
   });
 
+  // For recording multiple videos
+  const recordAnotherVideo = () => {
+    setcameraVisible(true);
+  };
+
+  const selectVideo = (video) => {
+    console.log("infunction");
+    setselectedVideo(video)
+  }
+  useEffect(() => {
+    console.log("Selected vdo", selectedVideo);
+  }, [selectedVideo])
+  // Main
   const renderCamera = () => {
     // const takePhoto = async () => {
     //   try {
@@ -94,16 +116,24 @@ const VideoRecorder = () => {
             <Text style={{ color: 'white', fontSize: 30, textAlign: 'center' }}>
               Record an exercise
             </Text>
+           
           </View>
           <View style={styles.cameraView}>
-
-            <Camera
-              style={StyleSheet.absoluteFill}
-              device={device}
-              isActive={true}
-              enableZoomGesture
-              ref={camera}
-              video={true}></Camera>
+            {cameraVisible ? (
+              <Camera
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={true}
+                enableZoomGesture
+                ref={camera}
+                // audio={true}
+                video={true}></Camera>
+            ) : (
+              <View style={{ flex: 1 }}>
+                <Video resizeMode='cover' source={{ uri: selectedVideo?.uri }}
+                  style={styles.backgroundVideo} />
+              </View>
+            )}
           </View>
 
           {/* videos.map((video, index) => (
@@ -112,47 +142,105 @@ const VideoRecorder = () => {
               <Video source={{ uri: video.uri }} style={{ width: '100%', height: 200 }} />
             </View>
           )) */}
+          {/* For title and delete vdo */}
+          {!cameraVisible && <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderWidth: 1, borderColor: 'red' }}>
+            <TextInput
+              editable
+              multiline
+              numberOfLines={4}
+              maxLength={40}
+              value={selectedVideo?.title}
+              style={{ marginLeft: 20, padding: 3, borderColor: '#CBDB2A', borderWidth: 1, width: '70%', height: '80%', color: 'white', borderRadius: 8 }}
+            />
+            <Icon
+              name="delete"
+              size={26}
+              color={'#D58E39'}
 
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+            />
+
+          </View>}
+          {/* For video slots */}
+          {!cameraVisible && <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
             {videos ? (
-              videos.map((video, index) => (
-                <View
-                  key={index}
-                  style={{
-                    marginRight: 10,
-                    borderWidth: 1,
-                    borderColor: 'white',
-                    borderRadius:8
-                  }}>
-                  <Text style={{ color: 'white' }}>{video.title}</Text>
-                  <Image
-                    source={{ uri: video.uri }}
-                    style={{ width: 70, height: 70 , borderRadius:8}}
-                  />
-                </View>
+              videos?.map((video, index) => (
+                <TouchableOpacity key={index} onPress={() => selectVideo(video)}>
+                  <View
+
+                    style={{
+                      marginRight: 10,
+                      borderWidth: 1,
+                      borderColor: 'white',
+                      borderRadius: 8,
+
+                    }}
+
+                  >
+                    {/* <Text style={{color: 'white'}}>{video.title}</Text> */}
+                    <Image
+                      source={{ uri: video.uri }}
+                      style={{ width: 70, height: 70, borderRadius: 8 }}
+                    />
+                  </View>
+                </TouchableOpacity>
               ))
             ) : (
               <></>
             )}
-          </View>
-
-          <View style={styles.buttonView}>
-          <Text style={styles.recordingStatus}>
-              {recording && <Text>{duration}</Text> }
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                if (recording) {
-                  stopRecording();
-                } else {
-                  startRecording();
-                }
-              }}
-              style={recording ? styles.CapturingButton : styles.CaptureButton}>
-                {recording ? <View style={styles.innerCapturingView}></View>:<></>}
+            {videos.length !== 0 ? (
+              <TouchableOpacity onPress={() => recordAnotherVideo()}>
+                <View
+                  style={{
+                    marginRight: 10,
+                    borderWidth: 1,
+                    borderColor: 'white',
+                    borderRadius: 8,
+                    borderStyle: 'dashed',
+                    justifyContent: 'center',
+                    width: 70,
+                    alignItems: 'center',
+                    height: 70,
+                  }}>
+                  <Icon name="add" size={40} color={'#CBDB2A'} />
+                </View>
               </TouchableOpacity>
-            
-          </View>
+            ) : (
+              <></>
+            )}
+          </View>}
+
+          {cameraVisible ? (
+            <View style={styles.buttonView}>
+              <Text style={styles.recordingStatus}>
+                {recording && <Text>{duration}</Text>}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  if (recording) {
+                    stopRecording();
+                  } else {
+                    startRecording();
+                  }
+                }}
+                style={
+                  recording ? styles.CapturingButton : styles.CaptureButton
+                }>
+                {recording ? (
+                  <View style={styles.innerCapturingView}></View>
+                ) : (
+                  <></>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity style={{flexDirection:'row',justifyContent:'center',height:'5%',alignItems:'center'}}>
+                <View style={{backgroundColor:'#3F7B8F' , alignItems:'center',width:'50%'}}>
+                  <Text>ADD VIDEOS TO PRESCRIPTION</Text>
+                </View>
+              </TouchableOpacity>
+            </>
+          )}
           {/* <View style={{ flex: 1 }}>
         <Text>Recorded Videos:</Text>
         {
@@ -168,7 +256,11 @@ const VideoRecorder = () => {
       );
     }
   };
-  return <SafeAreaView style={{ flex: 1, backgroundColor: '#7d7d7d' }}>{renderCamera()}</SafeAreaView>;
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#7d7d7d' }}>
+      {renderCamera()}
+    </SafeAreaView>
+  );
 };
 
 export default VideoRecorder;
@@ -181,13 +273,10 @@ const styles = StyleSheet.create({
   cameraView: {
     height: 400,
     margin: 20,
-    // borderWidth:4,
-    // borderColor:'red',
-    borderRadius: 10
+    borderRadius: 10,
   },
   cameraHeader: {
-    borderWidth: 2,
-    borderColor: 'green'
+
   },
   CaptureButton: {
     width: 90,
@@ -196,7 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 4,
     borderColor: 'white',
-    backgroundColor: '#c34c4d'
+    backgroundColor: '#c34c4d',
   },
   CapturingButton: {
     width: 90,
@@ -207,24 +296,26 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     // backgroundColor: 'green'
   },
-  innerCapturingView:{
-    flex:1,
-    backgroundColor:'#c34c4d',
-    width:44,
-    height:50,
-    margin:20,
-    borderRadius:10
+  innerCapturingView: {
+    flex: 1,
+    backgroundColor: '#c34c4d',
+    width: 44,
+    height: 50,
+    margin: 20,
+    borderRadius: 10,
   },
   buttonView: {
-    borderWidth: 1,
     alignItems: 'center',
     marginBottom: 12,
-    borderColor: 'green',
   },
   recordingStatus: {
     fontSize: 20,
     color: 'white',
-    backgroundColor:'#c34c4d',
-    borderRadius:4
+    backgroundColor: '#c34c4d',
+    borderRadius: 4,
+  },
+  backgroundVideo: {
+    width: '100%',
+    height: '100%'
   },
 });
