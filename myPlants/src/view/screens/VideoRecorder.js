@@ -27,6 +27,7 @@ const VideoRecorder = () => {
   const [intervalId, setIntervalId] = useState(null);
   // for displaying selected video
   const [selectedVideo, setselectedVideo] = useState(null)
+  const [indexCounter, setindexCounter] = useState(0)
 
   useEffect(() => { }, [recording]);
   const startRecording = async () => {
@@ -42,12 +43,15 @@ const VideoRecorder = () => {
         console.log(video),
         setVideos([
           ...videos,
-          { uri: video.path, title: 'Video ' + (videos.length + 1) },
-        ]),
+          { index: indexCounter,path: video.path, title: 'Video ' + (videos.length + 1) },
+        ]),selectVideo(indexCounter,video),setindexCounter(prevcount=> prevcount+1)
       ],
       onRecordingError: error => console.error(error),
     });
   };
+//   useEffect(()=>{
+//     console.log("indexCounter",indexCounter);
+//   },[indexCounter])
 
   const stopRecording = async () => {
     console.log('stoped');
@@ -81,10 +85,25 @@ const VideoRecorder = () => {
     setcameraVisible(true);
   };
 
-  const selectVideo = (video) => {
-    console.log("infunction");
-    setselectedVideo(video)
+  const [getindex, setgetindex] = useState()
+
+  const selectVideo = (index,video) => {
+    console.log("infunction",index);
+    // setgetindex(index)
+    setselectedVideo({...video,Pindex:index})
   }
+
+  
+
+//   
+let handleTitleChange = (e,i) => {
+    // let newFormValues = [...videos];
+    // console.log("FormData",newFormValues[i][e?.target?.title]);
+    // newFormValues[i][e?.target?.title] = e?.target.value;
+    // setVideos(newFormValues);
+  }
+
+
   useEffect(() => {
     console.log("Selected vdo", selectedVideo);
   }, [selectedVideo])
@@ -130,7 +149,7 @@ const VideoRecorder = () => {
                 video={true}></Camera>
             ) : (
               <View style={{ flex: 1 }}>
-                <Video resizeMode='cover' source={{ uri: selectedVideo?.uri }}
+                <Video resizeMode='cover' source={{ uri: selectedVideo?.path }}
                   style={styles.backgroundVideo} />
               </View>
             )}
@@ -149,6 +168,8 @@ const VideoRecorder = () => {
               multiline
               numberOfLines={4}
               maxLength={40}
+              onChange={(e)=> handleTitleChange(e,i)}
+
               value={selectedVideo?.title}
               style={{ marginLeft: 20, padding: 3, borderColor: '#CBDB2A', borderWidth: 1, width: '70%', height: '80%', color: 'white', borderRadius: 8 }}
             />
@@ -164,7 +185,7 @@ const VideoRecorder = () => {
           {!cameraVisible && <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
             {videos ? (
               videos?.map((video, index) => (
-                <TouchableOpacity key={index} onPress={() => selectVideo(video)}>
+                <TouchableOpacity key={index} onPress={() => selectVideo(video,index)}>
                   <View
 
                     style={{
@@ -178,7 +199,7 @@ const VideoRecorder = () => {
                   >
                     {/* <Text style={{color: 'white'}}>{video.title}</Text> */}
                     <Image
-                      source={{ uri: video.uri }}
+                      source={{ uri: video.path }}
                       style={{ width: 70, height: 70, borderRadius: 8 }}
                     />
                   </View>
