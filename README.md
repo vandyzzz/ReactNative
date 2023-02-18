@@ -1,1 +1,2 @@
+<a href="https://raw.githubusercontent.com/mrousavy/react-native-vision-camera/9963f4dedc6fbef933fb99e0adca1343f4f5f972/docs/static/img/11.png" /></a>
 This is a my REACT Native practise area. Where these repositories contain the essential ui and functionality for native. I've also integrated a setup for react-native vision camera for IOS and Android with permissions in android manifest and plist files :)
